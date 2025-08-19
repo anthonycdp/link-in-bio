@@ -1,0 +1,28 @@
+[build]
+  # CKDEV-NOTE: Build configuration for React client application
+  base = "client"
+  publish = "dist"
+  command = "rm -rf node_modules package-lock.json && npm install && npm run build"
+
+[build.environment]
+  NODE_VERSION = "18"
+
+# CKDEV-NOTE: Redirect rules for SPA routing
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# CKDEV-NOTE: Headers for security and performance
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"

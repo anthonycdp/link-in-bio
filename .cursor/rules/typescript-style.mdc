@@ -1,0 +1,369 @@
+# TypeScript Style Guidelines
+
+## Type Definitions
+
+### Interface vs Type
+- Use `interface` for object shapes that might be extended
+- Use `type` for unions, primitives, and computed types
+- Prefer `interface` for React component props
+
+```typescript
+// Preferred for component props
+interface ButtonProps {
+  variant: 'primary' | 'secondary'
+  children: React.ReactNode
+  onClick?: () => void
+}
+
+// Use type for unions and computed types
+type Status = 'loading' | 'success' | 'error'
+type ButtonSize = 'sm' | 'md' | 'lg'
+```
+
+### Naming Conventions
+- Use PascalCase for interfaces and types
+- Use descriptive names that indicate purpose
+- Add suffix for specific use cases: `Props`, `Config`, `Options`
+
+```typescript
+interface UserProfile {
+  id: string
+  name: string
+  email: string
+}
+
+interface UserProfileProps {
+  user: UserProfile
+  onEdit: (user: UserProfile) => void
+}
+
+type ApiResponse<T> = {
+  data: T
+  status: number
+  message?: string
+}
+```
+
+## React Component Types
+
+### Component Props
+```typescript
+// Functional component with proper typing
+interface HeaderProps {
+  title: string
+  subtitle?: string
+  actions?: React.ReactNode
+  className?: string
+}
+
+export const Header: React.FC<HeaderProps> = ({
+  title,
+  subtitle,
+  actions,
+  className
+}) => {
+  return (
+    <header className={className}>
+      <h1>{title}</h1>
+      {subtitle && <p>{subtitle}</p>}
+      {actions}
+    </header>
+  )
+}
+```
+
+### Event Handlers
+```typescript
+interface FormProps {
+  onSubmit: (data: FormData) => void
+  onChange: (field: string, value: string) => void
+}
+
+// Event handler types
+const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+  event.preventDefault()
+  // Handle click
+}
+
+const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const { name, value } = event.target
+  // Handle change
+}
+```
+
+### Ref Types
+```typescript
+import { useRef } from 'react'
+
+// Element refs
+const inputRef = useRef<HTMLInputElement>(null)
+const divRef = useRef<HTMLDivElement>(null)
+
+// Component refs
+const modalRef = useRef<ModalHandle>(null)
+```
+
+## Utility Types
+
+### Common Patterns
+```typescript
+// Extract props from existing components
+type ButtonVariant = React.ComponentProps<typeof Button>['variant']
+
+// Make properties optional
+type PartialUser = Partial<User>
+
+// Pick specific properties
+type UserSummary = Pick<User, 'id' | 'name' | 'email'>
+
+// Omit properties
+type CreateUser = Omit<User, 'id' | 'createdAt'>
+
+// Create unions from object keys
+type UserFields = keyof User
+```
+
+### Generic Types
+```typescript
+// Generic interfaces
+interface ApiResponse<T> {
+  data: T
+  success: boolean
+  error?: string
+}
+
+interface Repository<T, K = string> {
+  findById(id: K): Promise<T | null>
+  create(item: Omit<T, 'id'>): Promise<T>
+  update(id: K, updates: Partial<T>): Promise<T>
+  delete(id: K): Promise<void>
+}
+
+// Generic components
+interface ListProps<T> {
+  items: T[]
+  renderItem: (item: T) => React.ReactNode
+  keyExtractor: (item: T) => string
+}
+
+function List<T>({ items, renderItem, keyExtractor }: ListProps<T>) {
+  return (
+    <ul>
+      {items.map(item => (
+        <li key={keyExtractor(item)}>
+          {renderItem(item)}
+        </li>
+      ))}
+    </ul>
+  )
+}
+```
+
+## Error Handling Types
+
+### Error Types
+```typescript
+// Custom error types
+class ValidationError extends Error {
+  constructor(
+    message: string,
+    public field: string,
+    public code: string
+  ) {
+    super(message)
+    this.name = 'ValidationError'
+  }
+}
+
+// Result types for error handling
+type Result<T, E = Error> = 
+  | { success: true; data: T }
+  | { success: false; error: E }
+
+// Async result handling
+async function fetchUser(id: string): Promise<Result<User, string>> {
+  try {
+    const user = await api.getUser(id)
+    return { success: true, data: user }
+  } catch (error) {
+    return { success: false, error: 'Failed to fetch user' }
+  }
+}
+```
+
+## Strict Type Checking
+
+### Configuration
+```json
+{
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true
+  }
+}
+```
+
+### Type Guards
+```typescript
+// Type guard functions
+function isString(value: unknown): value is string {
+  return typeof value === 'string'
+}
+
+function isUser(obj: unknown): obj is User {
+  return (
+    typeof obj === 'object' &&
+    obj !== null &&
+    'id' in obj &&
+    'name' in obj &&
+    'email' in obj
+  )
+}
+
+// Usage with type narrowing
+function processValue(value: unknown) {
+  if (isString(value)) {
+    // value is now typed as string
+    return value.toUpperCase()
+  }
+  
+  if (isUser(value)) {
+    // value is now typed as User
+    return value.name
+  }
+  
+  throw new Error('Invalid value type')
+}
+```
+
+## Advanced Patterns
+
+### Conditional Types
+```typescript
+// Conditional type for API responses
+type ApiResult<T> = T extends string 
+  ? { message: T }
+  : { data: T }
+
+// Mapped types
+type Optional<T> = {
+  [K in keyof T]?: T[K]
+}
+
+type Required<T> = {
+  [K in keyof T]-?: T[K]
+}
+```
+
+### Template Literal Types
+```typescript
+// String manipulation types
+type EventName<T extends string> = `on${Capitalize<T>}`
+type Handler<T extends string> = `handle${Capitalize<T>}`
+
+// CSS property types
+type CSSProperty = `--${string}`
+type CSSValue = string | number
+```
+
+## Best Practices
+
+### Do's
+- Always provide explicit return types for functions
+- Use strict TypeScript configuration
+- Prefer type inference when obvious
+- Use discriminated unions for complex state
+- Implement proper error handling types
+
+### Don'ts
+- Avoid `any` type unless absolutely necessary
+- Don't ignore TypeScript errors
+- Don't use `Function` type, use specific function signatures
+- Avoid deep nesting in type definitions
+- Don't use `object` type, be specific
+
+### Code Examples
+
+#### Good Examples
+```typescript
+// Explicit function return type
+function calculateTotal(items: CartItem[]): number {
+  return items.reduce((sum, item) => sum + item.price * item.quantity, 0)
+}
+
+// Discriminated union for state management
+type AsyncState<T> =
+  | { status: 'idle' }
+  | { status: 'loading' }
+  | { status: 'success'; data: T }
+  | { status: 'error'; error: string }
+
+// Proper component typing
+interface ModalProps {
+  isOpen: boolean
+  onClose: () => void
+  title: string
+  children: React.ReactNode
+}
+```
+
+#### Avoid These Patterns
+```typescript
+// Bad: Using any
+function processData(data: any): any {
+  return data.something
+}
+
+// Bad: Implicit any
+function handleEvent(event) {
+  // event is implicitly any
+}
+
+// Bad: Non-descriptive types
+interface Props {
+  data: object
+  callback: Function
+}
+```
+
+## Testing with TypeScript
+
+### Test Types
+```typescript
+// Type-safe test utilities
+interface TestUser {
+  id: string
+  name: string
+  email: string
+}
+
+function createMockUser(overrides: Partial<TestUser> = {}): TestUser {
+  return {
+    id: '1',
+    name: 'Test User',
+    email: 'test@example.com',
+    ...overrides
+  }
+}
+
+// Component testing with proper types
+import { render, screen } from '@testing-library/react'
+import { Button } from './Button'
+
+test('renders button with correct props', () => {
+  const handleClick = vi.fn()
+  
+  render(
+    <Button variant="primary" onClick={handleClick}>
+      Click me
+    </Button>
+  )
+  
+  const button = screen.getByRole('button')
+  expect(button).toBeInTheDocument()
+})
+```

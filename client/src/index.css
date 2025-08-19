@@ -1,0 +1,66 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --serenity-bg: hsl(60, 16.7%, 96.5%);
+  --serenity-rose: hsl(344, 31.0%, 53.5%);
+  --serenity-wine: hsl(335, 41.9%, 30.8%);
+  --serenity-text: hsl(0, 0%, 23.5%);
+  --serenity-text-secondary: hsl(0, 0%, 35.3%);
+  --background: var(--serenity-bg);
+  --foreground: var(--serenity-text);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: var(--serenity-text);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: var(--serenity-text);
+  --primary: var(--serenity-rose);
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: var(--serenity-text);
+  --secondary-foreground: hsl(0, 0%, 100%);
+  --muted: hsl(240, 1.9608%, 90%);
+  --muted-foreground: var(--serenity-text);
+  --accent: hsl(344, 31.0%, 93%);
+  --accent-foreground: var(--serenity-rose);
+  --destructive: hsl(356.3033, 90.5579%, 54.3137%);
+  --destructive-foreground: hsl(0, 0%, 100%);
+  --border: hsl(344, 31.0%, 90%);
+  --input: hsl(0, 0%, 97%);
+  --ring: var(--serenity-rose);
+  --font-sans: 'Montserrat', sans-serif;
+  --font-serif: 'Playfair Display', serif;
+  --font-mono: Menlo, monospace;
+  --radius: 1rem;
+}
+
+.dark {
+  --background: hsl(0, 0%, 0%);
+  --foreground: hsl(0, 0%, 91.2%);
+  --card: hsl(0, 0%, 10%);
+  --card-foreground: hsl(0, 0%, 85.1%);
+  --popover: hsl(0, 0%, 0%);
+  --popover-foreground: hsl(0, 0%, 91.2%);
+  --primary: var(--serenity-rose);
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: hsl(0, 0%, 94.9%);
+  --secondary-foreground: hsl(0, 0%, 7.8%);
+  --muted: hsl(0, 0%, 9.4%);
+  --muted-foreground: hsl(0, 0%, 46.3%);
+  --accent: hsl(0, 0%, 7.8%);
+  --accent-foreground: var(--serenity-rose);
+  --destructive: hsl(356.3033, 90.5579%, 54.3137%);
+  --destructive-foreground: hsl(0, 0%, 100%);
+  --border: hsl(0, 0%, 14.9%);
+  --input: hsl(0, 0%, 18.4%);
+  --ring: var(--serenity-rose);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+  }
+}
